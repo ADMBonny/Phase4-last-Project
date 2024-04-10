@@ -1,0 +1,6 @@
+client/node_modules/
+# Ignore node_modules directory in the root of the repository
+node_modules/
+
+# Ignore node_modules directories in any subdirectories
+**/node_modules/
