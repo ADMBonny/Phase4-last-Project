@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Ensure the upload folder exists
+
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
