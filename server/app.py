@@ -1,20 +1,17 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
 from flask_migrate import Migrate
 from flask_cors import CORS
 from config import Config
-from models import db, Event, User  
+from models import db, Event
 from datetime import datetime
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
-
 import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Ensure the upload folder exists
+
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -96,41 +93,6 @@ def delete_event(event_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
-    
-
-@app.route('/signup', methods=['POST'])
-def signup():
-    data = request.json
-    username = data.get('username')
-    email = data.get('email')
-    password = data.get('password')
-
-    if not username or not email or not password:
-        return jsonify({"error": "Username, email, and password are required"}), 400
-
-    # Check if the user already exists by username or email
-    existing_user = User.query.filter(or_(User.username == username, User.email == email)).first()
-    if existing_user:
-        return jsonify({"error": "Email/Username already registered"}), 400
-
-    # Hash the password before storing it in the database
-    hashed_password = generate_password_hash(password)
-
-    # Create a new user
-    user = User(username=username, email=email, password=hashed_password)
-    db.session.add(user)
-    db.session.commit()
-
-    return jsonify({"message": "User registered successfully"}), 201
-
-# Route for user logout
-@app.route('/logout', methods=['POST'])
-def logout():
-    # Clear the user id from session to logout the user
-    session.pop('user_id', None)
-    return jsonify({"message": "Logout successful"}), 200
-
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
